@@ -1,0 +1,63 @@
+function checkEulerEquivalence(yaw, pitch, roll)
+    yaw_rad = deg2rad(yaw);
+    pitch_rad = deg2rad(pitch);
+    roll_rad = deg2rad(roll);
+
+    % Calculate rotation matrix for YPR (Z-Y'-X'') convention
+    Ryaw = [cos(yaw_rad) -sin(yaw_rad) 0;
+            sin(yaw_rad) cos(yaw_rad)  0;
+            0             0            1];
+
+    Rp = [cos(pitch_rad)  0 sin(pitch_rad);
+          0               1 0;
+          -sin(pitch_rad) 0 cos(pitch_rad)];
+
+    Rr = [1 0             0;
+          0 cos(roll_rad) -sin(roll_rad);
+          0 sin(roll_rad) cos(roll_rad)];
+
+    R_ypr = Rr * Rp * Ryaw; % Note the order of multiplication
+
+    % Calculate rotation matrix for RPY (X-Y'-Z'') convention
+    Rr_rpy = [1 0             0;
+              0 cos(roll_rad) -sin(roll_rad);
+              0 sin(roll_rad) cos(roll_rad)];
+
+    Rp_rpy = [cos(pitch_rad)  0 sin(pitch_rad);
+              0               1 0;
+              -sin(pitch_rad) 0 cos(pitch_rad)];
+
+    Ryaw_rpy = [cos(yaw_rad) -sin(yaw_rad) 0;
+                sin(yaw_rad) cos(yaw_rad)  0;
+                0             0            1];
+
+    R_rpy = Ryaw_rpy * Rp_rpy * Rr_rpy; % Note the order of multiplication
+
+    % Check for equivalence using a tolerance for floating-point comparisons
+    tolerance = 1e-9;
+    is_equivalent = all(abs(R_ypr(:) - R_rpy(:)) < tolerance);
+
+    % Display the results
+    disp('Yaw (Z), Pitch (Y''), Roll (X'') Rotation Matrix (YPR):');
+    disp(R_ypr);
+    disp(' ');
+    disp('Roll (X), Pitch (Y''), Yaw (Z'') Rotation Matrix (RPY):');
+    disp(R_rpy);
+    disp(' ');
+
+    if is_equivalent
+        disp('The YPR and RPY rotation matrices are equivalent within the tolerance.');
+    else
+        disp('The YPR and RPY rotation matrices are NOT equivalent.');
+    end
+end
+
+% Example usage:
+yaw_angle = 30;  % in degrees
+pitch_angle = 45; % in degrees
+roll_angle = 60;  % in degrees
+
+checkEulerEquivalence(yaw_angle, pitch_angle, roll_angle);
+
+% You can try with zero angles:
+checkEulerEquivalence(0, 0, 0);
