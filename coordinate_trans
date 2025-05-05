@@ -1,0 +1,50 @@
+% Original 3D coordinates (x, y, z)
+points = [1, 2, 3; 
+          4, 5, 6; 
+          7, 8, 9];  % Example: 3 points
+
+% Convert to homogeneous coordinates (add a column of ones)
+points_hom = [points, ones(size(points,1),1)];
+
+% Transformation parameters
+theta_x = deg2rad(30);  % Rotation around X axis (30 degrees)
+theta_y = deg2rad(45);  % Rotation around Y axis (45 degrees)
+theta_z = deg2rad(60);  % Rotation around Z axis (60 degrees)
+tx = 2;  % Translation x
+ty = 3;  % Translation y
+tz = 4;  % Translation z
+
+% Rotation matrix around X-axis
+Rx = [1, 0, 0;
+      0, cos(theta_x), -sin(theta_x);
+      0, sin(theta_x), cos(theta_x)];
+
+% Rotation matrix around Y-axis
+Ry = [cos(theta_y), 0, sin(theta_y);
+      0, 1, 0;
+     -sin(theta_y), 0, cos(theta_y)];
+
+% Rotation matrix around Z-axis
+Rz = [cos(theta_z), -sin(theta_z), 0;
+      sin(theta_z), cos(theta_z), 0;
+      0, 0, 1];
+
+% Combined rotation matrix (Z * Y * X order)
+R = Rz * Ry * Rx;
+
+% Homogeneous 4x4 transformation matrix
+T = [R, [tx; ty; tz];
+     0, 0, 0, 1];
+
+% Apply transformation
+transformed_points_hom = (T * points_hom')';
+
+% Extract (x, y, z) coordinates (drop homogeneous coordinate)
+transformed_points = transformed_points_hom(:,1:3);
+
+% Display results
+disp('Original points:');
+disp(points);
+
+disp('Transformed points:');
+disp(transformed_points);
